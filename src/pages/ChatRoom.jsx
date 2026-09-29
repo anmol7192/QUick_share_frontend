@@ -11,6 +11,8 @@ import {
 
 import {
   getRoomHistoryApi,
+  deleteMessageApi,
+  getActiveUsersApi,
   uploadFileApi,
 } from "../api/roomApi";
 
@@ -53,6 +55,9 @@ const ChatRoom = () => {
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
+
+  const [activeUsers, setActiveUsers] = useState([]);
+  const [activeUsersCount, setActiveUsersCount] = useState(0);
   
   useEffect(() => {
     if (!pendingFile) {
@@ -80,8 +85,36 @@ const ChatRoom = () => {
     )}?session_token=${encodeURIComponent(sessionToken)}`;
   };
 
+const loadActiveUsers = async () => {
+  try {
+    const response = await getActiveUsersApi(sessionToken);
 
+    setActiveUsers(response.data.active_users || []);
+    setActiveUsersCount(response.data.count || 0);
+  } catch (error) {
+    console.error("Failed to load active users:", error);
+  }
+};
+  useEffect(() => {
+    if (!sessionToken) return;
+    loadActiveUsers();
+  }, [sessionToken]);
 
+ const handleDeleteMessage = async (messageId) => {
+  try {
+    await deleteMessageApi(messageId, sessionToken);
+
+    setMessages((prev) =>
+      prev.filter((item) => item._id !== messageId)
+    );
+  } catch (error) {
+    console.error("Delete failed:", error);
+
+    setError(
+      error.response?.data?.detail || "Unable to delete message"
+    );
+  }
+};
   const openFile = (fileId) => {
     if (!fileId) return;
 
@@ -694,6 +727,15 @@ const ChatRoom = () => {
             <div className="chat-room-label">
               ROOM · {roomId || "No room ID"}
             </div>
+            <div className="chat-room-label">
+              Active users ({activeUsersCount})
+              {activeUsers.length > 0 && (
+                <span>
+                  {" · "}
+                  {activeUsers.map((user) => user.user_name).filter(Boolean).join(", ")}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -760,7 +802,7 @@ const ChatRoom = () => {
                 const isMine = messageUser === userName;
 
                 const messageTime = formatMessageTime(
-                  item.created_at
+                  item.sent_at || item.created_at
                 );
 
                 const hasFile = Boolean(item.file_id);
@@ -769,7 +811,7 @@ const ChatRoom = () => {
                   <div
                     key={
                       item._id ||
-                      `${item.created_at || "message"}-${index}`
+                      `${item.sent_at || item.created_at || "message"}-${index}`
                     }
                     className={`message-row ${
                       isMine
@@ -828,6 +870,16 @@ const ChatRoom = () => {
                             <span className="message-check">
                               ✓✓
                             </span>
+                          )}
+                          {isMine && item._id && (
+                            <button
+                              type="button"
+                              className="delete-message-button"
+                              onClick={() => handleDeleteMessage(item._id)}
+                              title="Delete message"
+                            >
+                              Delete
+                            </button>
                           )}
                         </div>
                       </div>

@@ -117,12 +117,11 @@ function Home() {
           <span className="logo-s">S</span>
         </div>
 
-        {/* TITLE */}
         <h1 className="home-title">
           Quick <span>Share</span>
         </h1>
 
-        {/* ROOM FORM */}
+      
         <div className="home-form">
           <label htmlFor="room-id">Enter Room ID</label>
 

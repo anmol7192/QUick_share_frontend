@@ -1,6 +1,7 @@
+
 import axios from "axios";
 
-const API_URL = "http://192.168.1.120:8000";
+const API_URL = "http://192.168.1.161:8000";
 
 // =========================================================
 // CREATE ROOM
@@ -25,7 +26,7 @@ export const joinRoomApi = async (roomId) => {
 };
 
 // =========================================================
-// GET HISTORY
+// GET MESSAGE HISTORY
 // =========================================================
 
 export const getRoomHistoryApi = async (
@@ -43,44 +44,64 @@ export const getRoomHistoryApi = async (
 };
 
 // =========================================================
+// DELETE MESSAGE
+// =========================================================
+
+export const deleteMessageApi = async (
+  messageId,
+  sessionToken
+) => {
+  return axios.delete(
+    `${API_URL}/message/${messageId}`,
+    {
+      params: {
+        session_token: sessionToken,
+      },
+    }
+  );
+};
+
+// =========================================================
+// GET ACTIVE USERS
+// =========================================================
+
+export const getActiveUsersApi = async (
+  sessionToken
+) => {
+  return axios.get(
+    `${API_URL}/room/active-users`,
+    {
+      params: {
+        session_token: sessionToken,
+      },
+    }
+  );
+};
+
+// =========================================================
 // FILE → BASE64
 // =========================================================
 
 const fileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
-
     const reader = new FileReader();
 
     reader.onload = () => {
-
       try {
-
         const result = reader.result;
-
-       
-
         const base64 = result.split(",")[1];
 
         resolve(base64);
-
       } catch (error) {
-
         reject(error);
-
       }
-
     };
 
     reader.onerror = () => {
-
-      reject(
-        new Error("Could not read file")
-      );
-
+      reject(new Error("Could not read file"));
     };
 
     reader.readAsDataURL(file);
-
   });
 };
 
@@ -93,51 +114,29 @@ export const uploadFileApi = async (
   sessionToken,
   file
 ) => {
-
   // 1. Convert file to Base64
-  const base64Data =
-    await fileToBase64(file);
+  const base64Data = await fileToBase64(file);
 
   // 2. Prepare form data
-  const formData =
-    new URLSearchParams();
+  const formData = new URLSearchParams();
 
-  formData.append(
-    "room_id",
-    roomId
-  );
-
-  formData.append(
-    "session_token",
-    sessionToken
-  );
-
-  formData.append(
-    "filename",
-    file.name
-  );
-
+  formData.append("room_id", roomId);
+  formData.append("session_token", sessionToken);
+  formData.append("filename", file.name);
   formData.append(
     "content_type",
-    file.type ||
-      "application/octet-stream"
+    file.type || "application/octet-stream"
   );
+  formData.append("file_data", base64Data);
 
-  formData.append(
-    "file_data",
-    base64Data
-  );
-
-  // 3. Upload
+  // 3. Upload file
   return axios.post(
     `${API_URL}/upload`,
     formData,
     {
       headers: {
-        "Content-Type":
-          "application/x-www-form-urlencoded",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
     }
   );
-
 };

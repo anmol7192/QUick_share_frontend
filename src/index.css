@@ -2578,3 +2578,52 @@ body {
     gap: 7px;
   }
 }
+
+.delete-message-button {
+  border: none;
+  background: transparent;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.delete-message-button:hover {
+  background: #fee2e2;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.message-bubble {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-meta span {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.delete-message-button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
