@@ -1,7 +1,7 @@
 
 import axios from "axios";
 
-const API_URL = "http://192.168.1.149:8000";
+const API_URL = "http://13.50.238.160:8005";
 
 // =========================================================
 // CREATE ROOM
