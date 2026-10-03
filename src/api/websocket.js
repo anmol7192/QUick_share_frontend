@@ -1,4 +1,4 @@
-const WS_URL = "http://13.50.238.160:8001";
+const WS_URL = "ws://13.50.238.160:8001";
 
 export const connectWebSocket = (
   sessionToken,
