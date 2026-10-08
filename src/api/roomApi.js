@@ -140,3 +140,21 @@ export const uploadFileApi = async (
     }
   );
 };
+// =========================================================
+// DOWNLOAD FILE
+// =========================================================
+
+export const downloadFileApi = async (
+  fileId,
+  sessionToken
+) => {
+  return axios.get(
+    `${API_URL}/download/${encodeURIComponent(fileId)}`,
+    {
+      params: {
+        session_token: sessionToken,
+      },
+      responseType: "blob",
+    }
+  );
+};

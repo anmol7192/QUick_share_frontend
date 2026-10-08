@@ -18,7 +18,7 @@ import {
 import {
   connectWebSocket,
 } from "../api/websocket";
-
+import ScreenShare from "../components/ScreenShare";
 // =========================================================
 // API URL
 // =========================================================
@@ -96,6 +96,9 @@ const ChatRoom = () => {
 
   const [activeUsersCount, setActiveUsersCount] =
     useState(0);
+
+  const [webSocket, setWebSocket] =
+    useState(null);
 
   // =======================================================
   // REFS
@@ -522,6 +525,7 @@ const ChatRoom = () => {
     }
 
     socketRef.current = ws;
+    setWebSocket(ws);
 
     // =====================================================
     // WEBSOCKET OPEN
@@ -583,8 +587,8 @@ const ChatRoom = () => {
       if (
         socketRef.current === ws
       ) {
-        socketRef.current =
-          null;
+        socketRef.current = null;
+        setWebSocket(null);
       }
     };
 
@@ -1327,6 +1331,15 @@ const ChatRoom = () => {
         </div>
 
       </header>
+
+      {/* =================================================
+          SCREEN SHARE
+          ================================================= */}
+
+      <ScreenShare
+        socket={webSocket}
+        userName={userName}
+      />
 
       {/* =================================================
           MAIN CHAT
