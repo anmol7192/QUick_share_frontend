@@ -13,12 +13,13 @@ import {
   getRoomHistoryApi,
   deleteMessageApi,
   uploadFileApi,
+  downloadFileApi,
 } from "../api/roomApi";
-
 import {
   connectWebSocket,
 } from "../api/websocket";
 import ScreenShare from "../components/ScreenShare";
+import { Download } from "lucide-react";
 // =========================================================
 // API URL
 // =========================================================
@@ -245,6 +246,40 @@ const ChatRoom = () => {
       "noopener,noreferrer"
     );
   };
+  const downloadFile = async (fileId, filename) => {
+  if (!fileId) {
+    return;
+  }
+
+  if (!sessionToken) {
+    setError("Session token is missing.");
+    return;
+  }
+
+  try {
+    const response = await downloadFileApi(
+      fileId,
+      sessionToken
+    );
+
+    const blob = response.data;
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename || "download";
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Download failed:", error);
+    setError("Unable to download file.");
+  }
+};
 
   // =======================================================
   // LOAD MESSAGE HISTORY
@@ -1070,25 +1105,56 @@ const ChatRoom = () => {
               : ""}
           </span>
 
-          <button
-            type="button"
-            onClick={() =>
-              openFile(fileId)
-            }
-            style={{
-              marginTop: "7px",
-              border: "none",
-              borderRadius: "8px",
-              padding: "6px 10px",
-              cursor: "pointer",
-              background: "white",
-              color: "#7b4fa3",
-              fontWeight: "700",
-              fontSize: "12px",
-            }}
-          >
-            Open File
-          </button>
+         <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    marginTop: "7px",
+  }}
+>
+  <button
+    type="button"
+    onClick={() =>
+      openFile(fileId)
+    }
+    style={{
+      border: "none",
+      borderRadius: "8px",
+      padding: "6px 10px",
+      cursor: "pointer",
+      background: "white",
+      color: "#7b4fa3",
+      fontWeight: "700",
+      fontSize: "12px",
+    }}
+  >
+    Open File
+  </button>
+
+  <button
+    type="button"
+    onClick={() =>
+      downloadFile(fileId, filename)
+    }
+    title="Download file"
+    aria-label="Download file"
+    style={{
+      border: "none",
+      borderRadius: "8px",
+      width: "32px",
+      height: "32px",
+      cursor: "pointer",
+      background: "white",
+      color: "#7b4fa3",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <Download size={17} />
+  </button>
+</div>
         </div>
       </div>
     );
